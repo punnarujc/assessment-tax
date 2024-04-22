@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/punnarujc/assessment-tax/lib/errs"
 )
 
 type Context struct {
@@ -16,11 +15,20 @@ func NewContext(c echo.Context) *Context {
 }
 
 func (c *Context) JSON(code int, obj interface{}) error {
-	switch obj.(type) {
+	// switch obj.(type) {
 
-	case errs.ErrContext:
-		return c.Context.JSON(code, obj)
-	}
+	// case errs.ErrContext:
+	// 	return c.Context.JSON(code, obj)
+	// }
 
 	return c.Context.JSON(code, obj)
+}
+
+func (c *Context) Bind(obj interface{}) error {
+	err := c.Context.Bind(obj)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

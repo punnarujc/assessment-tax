@@ -3,6 +3,7 @@ package calculations
 import (
 	"net/http"
 
+	"github.com/punnarujc/assessment-tax/lib/errs"
 	"github.com/punnarujc/assessment-tax/lib/server"
 )
 
@@ -11,12 +12,27 @@ type Handler interface {
 }
 
 type handlerImpl struct {
+	svc Service
 }
 
-func NewHandler() Handler {
-	return &handlerImpl{}
+func NewHandler(svc Service) Handler {
+	return &handlerImpl{
+		svc: svc,
+	}
 }
 
 func (h *handlerImpl) Calculations(c server.Context) error {
-	return c.JSON(http.StatusOK, map[string]interface{}{})
+	var req Request
+
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, errs.NewErrContextWithError(errs.BadRequest, err))
+	}
+
+	resp, err := h.svc.Process(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(errs.GenericError.HttpStatus, err)
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
