@@ -1,5 +1,7 @@
 package calculations
 
 func New() Handler {
-	return NewHandler()
+	svc := NewService()
+
+	return NewHandler(svc)
 }
