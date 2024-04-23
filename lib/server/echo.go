@@ -2,7 +2,7 @@ package server
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -43,7 +43,7 @@ func (e *echoServerImpl) Start() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	fmt.Print("\n\n\n--------- shutting down the server ---------\n\n")
+	log.Print("\n\n\n--------- shutting down the server ---------\n\n")
 
 	if err := e.engine.Shutdown(ctx); err != nil {
 		e.engine.Logger.Fatal(err)
