@@ -19,7 +19,7 @@ func Test_Service(t *testing.T) {
 	tax, err := svc.Process(context.Background(), req)
 
 	assert.NoError(t, err)
-	assert.True(t, tax.Tax.Equal(decimal.NewFromFloat(29000)), "tax %v should be equal to 29000", tax)
+	assert.True(t, tax.Tax.Equal(decimal.NewFromFloat(29000)), "tax %v should be equal to 29000", tax.Tax)
 }
 
 func Test_ServiceWithHoldingTax(t *testing.T) {
@@ -33,23 +33,36 @@ func Test_ServiceWithHoldingTax(t *testing.T) {
 	tax, err := svc.Process(context.Background(), req)
 
 	assert.NoError(t, err)
-	assert.True(t, tax.Tax.Equal(decimal.NewFromFloat(4000)), "tax %v should be equal to 4000", tax)
+	assert.True(t, tax.Tax.Equal(decimal.NewFromFloat(4000)), "tax %v should be equal to 4000", tax.Tax)
 }
 
 func Test_CalculateProgressiveTax(t *testing.T) {
 	svc := &serviceImpl{}
 
-	progressiveTax := svc.calculateProgressiveTax(decimal.NewFromFloat(440000))
+	pt, _ := svc.calculateProgressiveTax(decimal.NewFromFloat(440000))
+	pt2m, _ := svc.calculateProgressiveTax(decimal.NewFromFloat(10000000))
 
-	assert.True(t, progressiveTax.Equal(decimal.NewFromFloat(29000)), "progressiveTax %v should be equal to 29000", progressiveTax)
+	assert.True(t, pt.Equal(decimal.NewFromFloat(29000)), "progressiveTax %v should be equal to 29000", pt)
+	assert.True(t, pt2m.Equal(decimal.NewFromFloat(3110000)), "progressiveTax %v should be equal to 3110000", pt2m)
 }
 
-func Test_CalculateProgressiveTax2M(t *testing.T) {
+func Test_CalculateTaxLevel(t *testing.T) {
 	svc := &serviceImpl{}
 
-	progressiveTax := svc.calculateProgressiveTax(decimal.NewFromFloat(10000000))
+	_, tl := svc.calculateProgressiveTax(decimal.NewFromFloat(340000))
+	_, tl2 := svc.calculateProgressiveTax(decimal.NewFromFloat(10000000))
 
-	assert.True(t, progressiveTax.Equal(decimal.NewFromFloat(3110000)), "progressiveTax %v should be equal to 3110000", progressiveTax)
+	assert.True(t, tl[0].Tax.Equal(decimal.Zero), "taxLevel %v should be equal to 0", tl[0].Tax)
+	assert.True(t, tl[1].Tax.Equal(decimal.NewFromFloat(19000)), "taxLevel %v should be equal to 19000", tl[1].Tax)
+	assert.True(t, tl[2].Tax.Equal(decimal.Zero), "taxLevel %v should be equal to 0", tl[2].Tax)
+	assert.True(t, tl[3].Tax.Equal(decimal.Zero), "taxLevel %v should be equal to 0", tl[3].Tax)
+	assert.True(t, tl[4].Tax.Equal(decimal.Zero), "taxLevel %v should be equal to 0", tl[4].Tax)
+
+	assert.True(t, tl2[0].Tax.Equal(decimal.Zero), "taxLevel %v should be equal to 0", tl2[0].Tax)
+	assert.True(t, tl2[1].Tax.Equal(decimal.NewFromFloat(35000)), "taxLevel %v should be equal to 35000", tl2[1].Tax)
+	assert.True(t, tl2[2].Tax.Equal(decimal.NewFromFloat(75000)), "taxLevel %v should be equal to 75000", tl2[2].Tax)
+	assert.True(t, tl2[3].Tax.Equal(decimal.NewFromFloat(200000)), "taxLevel %v should be equal to 200000", tl2[3].Tax)
+	assert.True(t, tl2[4].Tax.Equal(decimal.NewFromFloat(2800000)), "taxLevel %v should be equal to 2800000", tl2[4].Tax)
 }
 
 func Test_CalculateTotalTaxableAmountOverLimit(t *testing.T) {
