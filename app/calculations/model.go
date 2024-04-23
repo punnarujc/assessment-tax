@@ -14,7 +14,13 @@ type Allowance struct {
 }
 
 type Response struct {
-	Tax decimal.Decimal `json:"tax"`
+	Tax      decimal.Decimal `json:"tax"`
+	TaxLevel []TaxLevel      `json:"taxLevel"`
+}
+
+type TaxLevel struct {
+	Level string          `json:"level"`
+	Tax   decimal.Decimal `json:"tax"`
 }
 
 type ProgressiveTaxRatio struct {
