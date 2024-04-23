@@ -1,6 +1,16 @@
 package server
 
-import "github.com/labstack/echo/v4"
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
+
+	"github.com/labstack/echo/v4"
+	"github.com/punnarujc/assessment-tax/lib/config"
+)
 
 type EchoServer interface {
 	Start()
@@ -19,7 +29,25 @@ func New() EchoServer {
 }
 
 func (e *echoServerImpl) Start() {
-	e.engine.Logger.Fatal(e.engine.Start(":8080"))
+	port := config.New().GetPort()
+
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+	go func() {
+		if err := e.engine.Start(port); err != nil && err != http.ErrServerClosed {
+			e.engine.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	<-ctx.Done()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	fmt.Print("\n\n\n--------- shutting down the server ---------\n\n")
+
+	if err := e.engine.Shutdown(ctx); err != nil {
+		e.engine.Logger.Fatal(err)
+	}
 }
 
 func (e *echoServerImpl) WithRouter(fn func(EchoServer)) {
