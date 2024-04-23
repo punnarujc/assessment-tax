@@ -22,8 +22,10 @@ func (s *serviceImpl) Process(ctx context.Context, req Request) (Response, error
 
 	progressiveTax := s.calculateProgressiveTax(totalTaxable)
 
+	tax := progressiveTax.Sub(req.Wht)
+
 	var resp = Response{
-		Tax: progressiveTax,
+		Tax: tax,
 	}
 
 	return resp, nil

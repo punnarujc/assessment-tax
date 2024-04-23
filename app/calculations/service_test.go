@@ -8,9 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_CalculateTotalTaxableAmount(t *testing.T) {
+func Test_Service(t *testing.T) {
 	svc := NewService()
-
 	req := Request{
 		TotalIncome: decimal.NewFromFloat(500000),
 		Wht:         decimal.Zero,
@@ -20,27 +19,41 @@ func Test_CalculateTotalTaxableAmount(t *testing.T) {
 	tax, err := svc.Process(context.Background(), req)
 
 	assert.NoError(t, err)
-	assert.Equal(t, tax.Tax.String(), decimal.NewFromFloat(29000).String())
+	assert.True(t, tax.Tax.Equal(decimal.NewFromFloat(29000)), "tax %v should be equal to 29000", tax)
 }
 
-func Test_CalculateTotalTaxableAmountMoreThan2M(t *testing.T) {
+func Test_ServiceWithHoldingTax(t *testing.T) {
 	svc := NewService()
-
 	req := Request{
-		TotalIncome: decimal.NewFromFloat(10000000),
-		Wht:         decimal.Zero,
+		TotalIncome: decimal.NewFromFloat(500000),
+		Wht:         decimal.NewFromFloat(25000),
 		Allowances:  []Allowance{},
 	}
 
 	tax, err := svc.Process(context.Background(), req)
 
 	assert.NoError(t, err)
-	assert.Equal(t, tax.Tax.String(), decimal.NewFromFloat(3089000).String())
+	assert.True(t, tax.Tax.Equal(decimal.NewFromFloat(4000)), "tax %v should be equal to 4000", tax)
 }
 
-func Test_CalculateTotalTaxableAmountWithAllowances(t *testing.T) {
-	svc := NewService()
+func Test_CalculateProgressiveTax(t *testing.T) {
+	svc := &serviceImpl{}
 
+	progressiveTax := svc.calculateProgressiveTax(decimal.NewFromFloat(440000))
+
+	assert.True(t, progressiveTax.Equal(decimal.NewFromFloat(29000)), "progressiveTax %v should be equal to 29000", progressiveTax)
+}
+
+func Test_CalculateProgressiveTax2M(t *testing.T) {
+	svc := &serviceImpl{}
+
+	progressiveTax := svc.calculateProgressiveTax(decimal.NewFromFloat(10000000))
+
+	assert.True(t, progressiveTax.Equal(decimal.NewFromFloat(3110000)), "progressiveTax %v should be equal to 3110000", progressiveTax)
+}
+
+func Test_CalculateTotalTaxableAmount(t *testing.T) {
+	svc := &serviceImpl{}
 	req := Request{
 		TotalIncome: decimal.NewFromFloat(500000),
 		Wht:         decimal.Zero,
@@ -52,8 +65,7 @@ func Test_CalculateTotalTaxableAmountWithAllowances(t *testing.T) {
 		},
 	}
 
-	tax, err := svc.Process(context.Background(), req)
+	taxableAmount := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req)
 
-	assert.NoError(t, err)
-	assert.Equal(t, tax.Tax.String(), decimal.NewFromFloat(19000).String())
+	assert.True(t, taxableAmount.Equal(decimal.NewFromFloat(340000)), "taxableAmount %v should be equal to 340000", taxableAmount)
 }
