@@ -9,7 +9,9 @@ import (
 )
 
 func Test_Service(t *testing.T) {
-	svc := NewService()
+	mockRepo := NewMockRepository(t)
+	mockRepo.On("GetMaximumDeduction").Return([]TblMaximumDeduction{}, nil)
+	svc := NewService(mockRepo)
 	req := Request{
 		TotalIncome: decimal.NewFromFloat(500000),
 		Wht:         decimal.Zero,
@@ -23,7 +25,9 @@ func Test_Service(t *testing.T) {
 }
 
 func Test_ServiceWithHoldingTax(t *testing.T) {
-	svc := NewService()
+	mockRepo := NewMockRepository(t)
+	mockRepo.On("GetMaximumDeduction").Return([]TblMaximumDeduction{}, nil)
+	svc := NewService(mockRepo)
 	req := Request{
 		TotalIncome: decimal.NewFromFloat(500000),
 		Wht:         decimal.NewFromFloat(25000),
@@ -78,7 +82,7 @@ func Test_CalculateTotalTaxableAmountOverLimit(t *testing.T) {
 		},
 	}
 
-	taxableAmount := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req)
+	taxableAmount := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req, []TblMaximumDeduction{})
 
 	assert.True(t, taxableAmount.Equal(decimal.NewFromFloat(340000)), "taxableAmount %v should be equal to 340000", taxableAmount)
 }
@@ -95,8 +99,16 @@ func Test_CalculateTotalTaxableAmount(t *testing.T) {
 			},
 		},
 	}
+	tblMaximumDeduction := []TblMaximumDeduction{
+		{
+			AllowanceType: "personal",
+			Amount:        decimal.NewFromFloat(40000),
+		},
+	}
 
-	taxableAmount := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req)
+	taxableAmount := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req, []TblMaximumDeduction{})
+	taxableAmountWithDb := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req, tblMaximumDeduction)
 
 	assert.True(t, taxableAmount.Equal(decimal.NewFromFloat(390000)), "taxableAmount %v should be equal to 390000", taxableAmount)
+	assert.True(t, taxableAmountWithDb.Equal(decimal.NewFromFloat(410000)), "taxableAmountWithDb %v should be equal to 3410000", taxableAmountWithDb)
 }

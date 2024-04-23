@@ -22,7 +22,7 @@ func NewRouter(db *gorm.DB) Router {
 }
 
 func (r *routerImpl) Router(s server.EchoServer) {
-	calculationsHandler := calculations.New()
+	calculationsHandler := calculations.New(r.db)
 	deductionsHandler := deductions.New(r.db)
 
 	s.POST("/tax/calculations", calculationsHandler.Calculations)

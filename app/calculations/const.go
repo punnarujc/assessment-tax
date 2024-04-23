@@ -52,6 +52,6 @@ var (
 	ALLOWANCE_MAX_AMOUNT map[string]decimal.Decimal = map[string]decimal.Decimal{
 		ALLOWANCE_TYPE_DONATION:  decimal.NewFromInt(100000),
 		ALLOWANCE_TYPE_K_RECEIPT: decimal.NewFromInt(50000),
-		ALLOWANCE_TYPE_PERSONAL:  decimal.NewFromInt(60000),
+		ALLOWANCE_TYPE_PERSONAL:  decimal.NewFromInt(100000),
 	}
 )

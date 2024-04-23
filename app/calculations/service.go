@@ -11,14 +11,22 @@ type Service interface {
 }
 
 type serviceImpl struct {
+	repo Repository
 }
 
-func NewService() Service {
-	return &serviceImpl{}
+func NewService(repo Repository) Service {
+	return &serviceImpl{
+		repo: repo,
+	}
 }
 
 func (s *serviceImpl) Process(ctx context.Context, req Request) (Response, error) {
-	totalTaxable := s.calculateTotalTaxableAmount(req.TotalIncome, req)
+	tblMaximumDeduction, err := s.repo.GetMaximumDeduction()
+	if err != nil {
+		return Response{}, err
+	}
+
+	totalTaxable := s.calculateTotalTaxableAmount(req.TotalIncome, req, tblMaximumDeduction)
 
 	progressiveTax, taxLevel := s.calculateProgressiveTax(totalTaxable)
 
@@ -32,12 +40,19 @@ func (s *serviceImpl) Process(ctx context.Context, req Request) (Response, error
 	return resp, nil
 }
 
-func (s *serviceImpl) calculateTotalTaxableAmount(amount decimal.Decimal, req Request) decimal.Decimal {
+func (s *serviceImpl) calculateTotalTaxableAmount(amount decimal.Decimal, req Request, tblMaximumDeduction []TblMaximumDeduction) decimal.Decimal {
 	var taxableAmount = amount
+
+	personalDeduct := PERSONAL_DEDUCTION_60K
+	for _, v := range tblMaximumDeduction {
+		if v.AllowanceType == ALLOWANCE_TYPE_PERSONAL {
+			personalDeduct = v.Amount
+		}
+	}
 
 	allowances := append(req.Allowances, Allowance{
 		AllowanceType: ALLOWANCE_TYPE_PERSONAL,
-		Amount:        PERSONAL_DEDUCTION_60K,
+		Amount:        personalDeduct,
 	})
 
 	for _, alw := range allowances {

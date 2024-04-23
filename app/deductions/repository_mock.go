@@ -12,34 +12,6 @@ type MockRepository struct {
 	mock.Mock
 }
 
-// GetMaximumDeduction provides a mock function with given fields: allowanceType
-func (_m *MockRepository) GetMaximumDeduction(allowanceType string) (TblMaximumDeduction, error) {
-	ret := _m.Called(allowanceType)
-
-	if len(ret) == 0 {
-		panic("no return value specified for GetMaximumDeduction")
-	}
-
-	var r0 TblMaximumDeduction
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (TblMaximumDeduction, error)); ok {
-		return rf(allowanceType)
-	}
-	if rf, ok := ret.Get(0).(func(string) TblMaximumDeduction); ok {
-		r0 = rf(allowanceType)
-	} else {
-		r0 = ret.Get(0).(TblMaximumDeduction)
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(allowanceType)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // UpsertMaximumDeduction provides a mock function with given fields: allowanceType, amount
 func (_m *MockRepository) UpsertMaximumDeduction(allowanceType string, amount decimal.Decimal) error {
 	ret := _m.Called(allowanceType, amount)
