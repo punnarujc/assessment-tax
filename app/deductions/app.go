@@ -1,4 +1,4 @@
-package calculations
+package deductions
 
 import "gorm.io/gorm"
 

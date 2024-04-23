@@ -32,3 +32,7 @@ func (c *Context) Bind(obj interface{}) error {
 
 	return nil
 }
+
+func (c *Context) Param(name string) string {
+	return c.Context.Param(name)
+}
