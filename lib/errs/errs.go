@@ -32,19 +32,3 @@ func (r *ErrContext) GetHttpStatus() int {
 func (r *ErrContext) GetErrDesc() string {
 	return r.ErrDesc
 }
-
-// func ToErrContext(e error) *ErrContext {
-// 	result := NewErrContext(GenericError)
-
-// 	var httpStatus GetHttpStatus
-// 	var code GetCode
-// 	var err GetError
-// 	var exposeError GetExposeError
-// 	var errCode ErrCode
-
-// 	if errors.As(e, &httpStatus) {
-// 		result.HttpStatus = httpStatus.GetHttpStatus()
-// 	}
-
-// 	return &result
-// }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/punnarujc/assessment-tax/lib/config"
 )
 
 type EchoServer interface {
@@ -28,10 +29,12 @@ func New() EchoServer {
 }
 
 func (e *echoServerImpl) Start() {
+	port := config.New().GetPort()
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 	go func() {
-		if err := e.engine.Start(":8080"); err != nil && err != http.ErrServerClosed {
+		if err := e.engine.Start(port); err != nil && err != http.ErrServerClosed {
 			e.engine.Logger.Fatal("shutting down the server")
 		}
 	}()
