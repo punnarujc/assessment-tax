@@ -12,7 +12,7 @@ func (r *Request) isAllowanceTypeValid(allowanceType string) bool {
 }
 
 func (r *Request) isAmountValid(allowanceType string) bool {
-	return ALLOWANCE_MAX_AMOUNT[allowanceType].GreaterThan(r.Amount)
+	return ALLOWANCE_MAX_AMOUNT[allowanceType].GreaterThanOrEqual(r.Amount) && ALLOWANCE_MIN_AMOUNT[allowanceType].LessThanOrEqual(r.Amount)
 }
 
 type Response struct {
