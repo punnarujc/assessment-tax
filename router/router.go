@@ -4,6 +4,7 @@ import (
 	"github.com/punnarujc/assessment-tax/app/calculations"
 	"github.com/punnarujc/assessment-tax/app/deductions"
 	"github.com/punnarujc/assessment-tax/app/uploadcsv"
+	"github.com/punnarujc/assessment-tax/lib/mdw"
 	"github.com/punnarujc/assessment-tax/lib/server"
 	"gorm.io/gorm"
 )
@@ -29,5 +30,5 @@ func (r *routerImpl) Router(s server.EchoServer) {
 
 	s.POST("/tax/calculations", calculationsHandler.Calculations)
 	s.POST("/tax/calculations/upload-csv", uploadCsvHandler.UploadCsv)
-	s.POST("/admin/deductions/:allowanceType", deductionsHandler.Deductions)
+	s.POST("/admin/deductions/:allowanceType", deductionsHandler.Deductions, mdw.BasicAuth())
 }

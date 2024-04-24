@@ -15,7 +15,7 @@ import (
 type EchoServer interface {
 	Start()
 	WithRouter(fn func(EchoServer))
-	POST(relativePath string, handlerFunc HandlerFunc)
+	POST(relativePath string, handlerFunc HandlerFunc, mdwFunc ...echo.MiddlewareFunc)
 }
 
 type echoServerImpl struct {
@@ -56,6 +56,6 @@ func (e *echoServerImpl) WithRouter(fn func(EchoServer)) {
 
 type HandlerFunc func(Context) error
 
-func (e *echoServerImpl) POST(relativePath string, handlerFunc HandlerFunc) {
-	e.engine.POST(relativePath, Convert(handlerFunc))
+func (e *echoServerImpl) POST(relativePath string, handlerFunc HandlerFunc, mdwFunc ...echo.MiddlewareFunc) {
+	e.engine.POST(relativePath, Convert(handlerFunc), mdwFunc...)
 }
