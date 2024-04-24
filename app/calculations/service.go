@@ -31,10 +31,16 @@ func (s *serviceImpl) Process(ctx context.Context, req Request) (Response, error
 	progressiveTax, taxLevel := s.calculateProgressiveTax(totalTaxable)
 
 	tax := progressiveTax.Sub(req.Wht)
+	taxRefund := decimal.Zero
+	if tax.LessThan(decimal.Zero) {
+		tax = decimal.Zero
+		taxRefund = progressiveTax.Sub(req.Wht).Neg()
+	}
 
 	var resp = Response{
-		Tax:      tax,
-		TaxLevel: taxLevel,
+		Tax:       tax,
+		TaxRefund: taxRefund,
+		TaxLevel:  taxLevel,
 	}
 
 	return resp, nil
