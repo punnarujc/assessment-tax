@@ -97,6 +97,10 @@ func Test_CalculateTotalTaxableAmount(t *testing.T) {
 				AllowanceType: "donation",
 				Amount:        decimal.NewFromFloat(50000),
 			},
+			{
+				AllowanceType: "k-receipt",
+				Amount:        decimal.NewFromFloat(200000),
+			},
 		},
 	}
 	tblMaximumDeduction := []TblMaximumDeduction{
@@ -104,11 +108,15 @@ func Test_CalculateTotalTaxableAmount(t *testing.T) {
 			AllowanceType: "personal",
 			Amount:        decimal.NewFromFloat(40000),
 		},
+		{
+			AllowanceType: "k-receipt",
+			Amount:        decimal.NewFromFloat(60000),
+		},
 	}
 
 	taxableAmount := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req, []TblMaximumDeduction{})
 	taxableAmountWithDb := svc.calculateTotalTaxableAmount(decimal.NewFromFloat(500000), req, tblMaximumDeduction)
 
-	assert.True(t, taxableAmount.Equal(decimal.NewFromFloat(390000)), "taxableAmount %v should be equal to 390000", taxableAmount)
-	assert.True(t, taxableAmountWithDb.Equal(decimal.NewFromFloat(410000)), "taxableAmountWithDb %v should be equal to 3410000", taxableAmountWithDb)
+	assert.True(t, taxableAmount.Equal(decimal.NewFromFloat(340000)), "taxableAmount %v should be equal to 390000", taxableAmount)
+	assert.True(t, taxableAmountWithDb.Equal(decimal.NewFromFloat(360000)), "taxableAmountWithDb %v should be equal to 3600000", taxableAmountWithDb)
 }
