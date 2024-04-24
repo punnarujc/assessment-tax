@@ -1,6 +1,8 @@
 package server
 
 import (
+	"mime/multipart"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -35,4 +37,8 @@ func (c *Context) Bind(obj interface{}) error {
 
 func (c *Context) Param(name string) string {
 	return c.Context.Param(name)
+}
+
+func (c *Context) FormFile(name string) (*multipart.FileHeader, error) {
+	return c.Context.FormFile(name)
 }
