@@ -11,9 +11,11 @@ func Test_AllowanceType(t *testing.T) {
 	var req = &Request{}
 
 	personal := req.isAllowanceTypeValid("personal")
+	kReceipt := req.isAllowanceTypeValid("k-receipt")
 	insurance := req.isAllowanceTypeValid("insurance")
 
 	assert.True(t, personal, "personal should be valid")
+	assert.True(t, kReceipt, "k-receipt should be valid")
 	assert.False(t, insurance, "insurance should not be valid")
 }
 
