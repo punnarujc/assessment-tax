@@ -24,8 +24,14 @@ func (s *serviceImpl) Process(ctx context.Context, req Request, allowanceType st
 		return Response{}, err
 	}
 
-	var resp = Response{
-		PersonalDeduction: req.Amount,
+	var resp = Response{}
+
+	switch allowanceType {
+	case ALLOWANCE_TYPE_PERSONAL:
+		resp.PersonalDeduction = &req.Amount
+	case ALLOWANCE_TYPE_K_RECEIPT:
+		resp.Kreceipt = &req.Amount
+	default:
 	}
 
 	return resp, nil

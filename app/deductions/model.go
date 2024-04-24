@@ -16,5 +16,6 @@ func (r *Request) isAmountValid(allowanceType string) bool {
 }
 
 type Response struct {
-	PersonalDeduction decimal.Decimal `json:"personalDeduction"`
+	PersonalDeduction *decimal.Decimal `json:"personalDeduction,omitempty"`
+	Kreceipt          *decimal.Decimal `json:"kReceipt,omitempty"`
 }
